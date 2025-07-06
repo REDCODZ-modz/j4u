@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Woy! Ada Sesuatu Buat Kamu Nih!</title>
+<style>
+        /* CSS Keyframes untuk Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.7); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            40% { transform: scale(1); }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes floaty {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% }
+            100% { background-position: 100% }
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+        @keyframes wrongAnswer {
+            0%, 100% { transform: translateX(0); background-color: #ffebee; }
+            25% { transform: translateX(-10px); background-color: #ffcdd2; }
+            50% { transform: translateX(10px); background-color: #ef9a9a; }
+            75% { transform: translateX(-10px); background-color: #ffcdd2; }
+        }
+
+        /* Styling Utama */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #fdf2e9 0%, #ffeadb 100%);
+            font-family: 'Comic Neue', 'Poppins', 'Segoe UI', sans-serif;
+            overflow: hidden;
+            color: #4a4a4a;
+            cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAVVJREFUSEullv0xBEEQhL8WQARkQASIgAiQAREgAkSACBABIkAEiIAIyIAIyIAI5D5VNd09u7u7u7v2b6tWq9nn3Nzcs3vtX958vB0AdsAB2AIHYBUcgC9vvjwDvoJn8SgewbL5FvgGD+DA3ZDqhto28AC2wAb4aljTghiwA3SAA9gC2AU+wKx5YlgdgzWwfAS0AO6ADbAB9oXFw7oEcALHwAbYCxYX0ydwBeyCLbABZ4CInYQfsB0aPSF8BNsAugQfM9RTYa41p/YA+8Q2sF9IDyD8GcAHsAKcF9w4o4DXwCwP2hwJWwARYAlwBF+ACBIAVsAdE/Ra4boEnMBPCJDbAAtkA/AUgD3wCsoAN0A9sLYIvsAesVhKQ9wEXwAWYEqLHAjP5bmATaAfsAk8SPiYXWsG9EtwL+OE9AU+jA1QfsCdhF2AAAAAASUVORK5CYII='), auto;
+        }
+
+        /* Pengaturan Layar (Screen) */
+        .screen {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s;
+            box-sizing: border-box;
+        }
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Kartu Pesan */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+        }
+        .screen.active .card {
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Elemen di dalam kartu */
+        .character-gif {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .character-gif:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+        .message-text, .final-message {
+            font-size: 20px;
+            font-weight: 600;
+            min-height: 50px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 22px;
+            background-color: #ff6b6b;
+            animation: blink 0.7s infinite;
+        }
+        .name-input {
+            width: 80%; 
+            padding: 12px; 
+            border-radius: 50px; 
+            border: 2px solid #ffb7b7;
+            text-align: center; 
+            font-size: 16px; 
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        .name-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        .name-input.wrong {
+            animation: wrongAnswer 0.5s;
+            border-color: #f44336;
+        }
+        .btn {
+            padding: 12px 30px; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 16px;
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #fad0c4 0%, #ff9a9e 99%, #ff9a9e 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        .btn:hover::before {
+            opacity: 1;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            opacity: 0;
+            height: 0;
+            transition: all 0.3s ease;
+        }
+        .error-message.show {
+            opacity: 1;
+            height: auto;
+        }
+
+        /* Modal untuk tombol 'Enggak' */
+        #no-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        #no-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        #no-modal .card {
+             animation: shake 0.5s;
+        }
+        
+        canvas {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: -1; 
+            pointer-events: none;
+        }
+    
+        .rainbow-text {
+            background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow 3s linear infinite;
+            font-weight: bold;
+        }
+        
+        .final-image {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pentol-heart {
+            width: 180px;
+            animation: floaty 3s ease-in-out infinite, heartbeat 1.5s ease infinite;
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+            animation: sparkle 1s ease-out forwards;
+        }
+        
+        .floating-hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            opacity: 0;
+            font-size: 20px;
+            color: #ff6b6b;
+            animation: float-up 4s linear forwards;
+        }
+        
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .hidden-message {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.2);
+            cursor: default;
+            transition: color 0.3s ease;
+        }
+        .hidden-message:hover {
+            color: rgba(0,0,0,0.5);
+        }
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div class="floating-hearts" id="floating-hearts"></div>
+
+<div class="screen" id="no-modal">
+<div class="card">
+<img alt="Pentol Ngambek" class="character-gif" src="anim/nangis.gif"/>
+<p class="message-text">Yahh, jangan gitu dong! 😭<br>Padahal aku udah latihan dadakan buat ini~</p>
+</div>
+</div>
+
+<div class="screen active" id="screen-name">
+<div class="card">
+<img alt="Pentol Nunggu" class="character-gif" src="menunggu.gif"/>
+<input class="name-input" id="name-input" placeholder="Masukkan nama kamu..." type="text"/>
+<div class="error-message" id="error-message">Wah salah! Itu Bukan Nama Kamu</div>
+<button class="btn" onclick="validateName()">Ini Namaku! 💖</button>
+</div>
+</div>
+
+<div class="screen" id="screen-question">
+<div class="card">
+<img alt="Pentol Hai" class="character-gif" src="hai.gif"/>
+<p class="message-text" id="question-text"></p>
+<div class="button-container">
+<button class="btn" id="yes-btn" onclick="showPrank()">masa sih? 🤪</button>
+<button class="btn" id="no-btn" onclick="handleNoClick()">Nggak ah 😒</button>
+</div>
+</div>
+</div>
+
+<div class="screen" id="screen-prank">
+<div class="card">
+<img alt="Pentol Joget" class="character-gif" src="joget.gif"/>
+<p class="message-text" id="prank-text"></p>
+</div>
+</div>
+
+<div class="screen" id="screen-final">
+<div class="card">
+<img alt="Pentol Cinta" class="character-gif" src="cinta.gif"/>
+<p class="final-message rainbow-text" id="final-message-text"></p>
+
+<div class="final-image">
+<img alt="Pentol Hearts" class="pentol-heart" src="anim/cinta.gif"/>
+</div>
+</div>
+</div>
+
+<audio id="background-music" loop="" src="https://litter.catbox.moe/gq1r3g.mp3"></audio>
+<audio id="heart-sound" src="https://litter.catbox.moe/5gx1t5.mp3"></audio>
+<audio id="sparkle-sound" src="https://litter.catbox.moe/1o1w5s.mp3"></audio>
+<audio id="wrong-sound" src="https://litter.catbox.moe/5l1x5t.mp3"></audio>
+
+<div class="hidden-message" onclick="showSecretMessage()">klik kalo penasaran 😏</div>
+
+<script>
+        let userName = '';
+        const music = document.getElementById('background-music');
+        const heartSound = document.getElementById('heart-sound');
+        const sparkleSound = document.getElementById('sparkle-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        let isSecretMessageShown = false;
+
+        // Efek sparkle saat mengklik
+        document.addEventListener('click', function(e) {
+            createSparkle(e.clientX, e.clientY);
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = `${x - 5}px`;
+            sparkle.style.top = `${y - 5}px`;
+            document.body.appendChild(sparkle);
+            
+            sparkleSound.currentTime = 0;
+            sparkleSound.play();
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 1000);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = `${Math.random() * 100}vw`;
+            heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            document.getElementById('floating-hearts').appendChild(heart);
+            
+            heartSound.volume = 0.3;
+            heartSound.currentTime = 0;
+            heartSound.play();
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 4000);
+        }
+
+        // Buat hati mengambang secara berkala
+        setInterval(createHeart, 800);
+
+        function switchScreen(currentScreenId, nextScreenId, callback) {
+            document.getElementById(currentScreenId).classList.remove('active');
+            setTimeout(() => {
+                document.getElementById(nextScreenId).classList.add('active');
+                if (callback) setTimeout(callback, 500);
+            }, 600);
+        }
+
+        function typeWriter(elementId, text, speed = 50) {
+            let i = 0;
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<span class="cursor"></span>`;
+            function typing() {
+                if (i < text.length) {
+                    element.innerHTML = text.substring(0, i + 1) + `<span class="cursor"></span>`;
+                    i++;
+                    setTimeout(typing, speed);
+                    
+                    if (i % 5 === 0) {
+                        const rect = element.getBoundingClientRect();
+                        createSparkle(
+                            rect.left + Math.random() * rect.width,
+                            rect.top + Math.random() * rect.height
+                        );
+                    }
+                } else {
+                    element.innerHTML = text;
+                }
+            }
+            typing();
+        }
+
+        // --- Validasi Nama ---
+        function validateName() {
+            const nameInput = document.getElementById('name-input');
+            const errorMessage = document.getElementById('error-message');
+            const enteredName = nameInput.value.trim().toLowerCase();
+            
+            if (enteredName === 'nadia') {
+                nameInput.classList.remove('wrong');
+                errorMessage.classList.remove('show');
+                startGame();
+            } else {
+                nameInput.classList.add('wrong');
+                errorMessage.classList.add('show');
+                wrongSound.currentTime = 0;
+                wrongSound.play();
+                
+                nameInput.placeholder = "Hint: Nama panggilan favoritku 😘";
+                nameInput.value = '';
+                
+                const sadHeart = document.createElement('div');
+                sadHeart.className = 'heart';
+                sadHeart.innerHTML = '💔';
+                sadHeart.style.left = `${Math.random() * 80 + 10}vw`;
+                sadHeart.style.animationDuration = '3s';
+                document.getElementById('floating-hearts').appendChild(sadHeart);
+                setTimeout(() => {
+                    sadHeart.remove();
+                }, 3000);
+            }
+        }
+
+        // --- Alur Cerita Lebih Lucu ---
+        function startGame() {
+            userName = 'Nadia';
+            
+            const nameInput = document.getElementById('name-input');
+            nameInput.style.transform = 'scale(1.1)';
+            nameInput.style.backgroundColor = '#f8fff0';
+            setTimeout(() => {
+                nameInput.style.transform = 'scale(1)';
+            }, 300);
+            
+            switchScreen('screen-name', 'screen-question', () => {
+                typeWriter('question-text', `Nad... eh maksudnya *Nadia yang super cool* 😎
+Aku punya pertanyaan penting nih...
+Percaya nggak kalau aku bisa bikin kamu senyum hari ini? 🙃`);
+            });
+        }
+
+        function showPrank() {
+            const yesBtn = document.getElementById('yes-btn');
+            yesBtn.innerHTML = 'Yakin banget! 🤪';
+            yesBtn.style.animation = 'heartbeat 0.5s ease';
+            setTimeout(() => {
+                yesBtn.style.animation = '';
+            }, 500);
+            
+            switchScreen('screen-question', 'screen-prank', () => {
+                typeWriter('prank-text', `Lah ga percaya! Tapi aku sendiri juga ga yakin sih 🤣
+Tapi beneran deh, wajah kamu manis banget pas senyum gitu...
+Kayak kucing kesetrum 😹`);
+                
+                setTimeout(() => {
+                    for (let i = 0; i < 50; i++) {
+                        createHeart();
+                    }
+                }, 2000);
+                
+                setTimeout(showFinalMessage, 10000);
+            });
+        }
+        
+        function showFinalMessage() {
+            fadeInMusic(music);
+            startConfetti();
+            switchScreen('screen-prank', 'screen-final', () => {
+                typeWriter('final-message-text', `Fakta-fakta random tentang kamu:
+                
+1. Ketawamu itu obat stres level dewa 🦸‍♀️
+
+2. Kamu satu-satunya orang yang bisa bikin aku ngetik pakai satu tangan...
+   ...soalnya tangan satunya lagi megang pancingan 🤸‍♂️
+3. Kalau kamu marah, kayak anak kenyang kurang tidur - lucu dan nyebelin ( emhhhhh mungkin ya mungkin)😼
+
+Pokoknya kamu itu...
+...the human version of bubble tea! 🧋
+(boba-nya banyak, manisnya pas, bikin nagih~)`);
+            });
+            
+            const heartsInterval = setInterval(() => {
+                for (let i = 0; i < 5; i++) {
+                    createHeart();
+                }
+            }, 300);
+            
+            setTimeout(() => {
+                clearInterval(heartsInterval);
+            }, 10000);
+        }
+
+        // --- Logika Tombol "Enggak" yang Ngambek ---
+        const noBtn = document.getElementById('no-btn');
+        const noModal = document.getElementById('no-modal');
+        
+        function handleNoClick() {
+            noBtn.innerHTML = 'Aduh maafin aku 😢';
+            noBtn.style.animation = 'shake 0.5s ease';
+            setTimeout(() => {
+                noBtn.innerHTML = 'Nggak ah 😒';
+                noBtn.style.animation = '';
+            }, 2000);
+            
+            noModal.classList.add('active');
+            setTimeout(() => {
+                noModal.classList.remove('active');
+                moveNoButton();
+            }, 2500);
+        }
+        
+        function moveNoButton() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${Math.random() * (viewportWidth - noBtn.offsetWidth)}px`;
+            noBtn.style.top = `${Math.random() * (viewportHeight - noBtn.offsetHeight)}px`;
+            noBtn.style.transition = 'all 0.5s ease';
+            
+            createHeart();
+        }
+        noBtn.addEventListener('mouseover', moveNoButton);
+
+        // --- Fungsi Konfeti ---
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        const colors = ["#ff8a80", "#ffd180", "#80d8ff", "#a7ffeb", "#f8bbd0", "#ff80ab", "#ea80fc"];
+
+        function startConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            if (confettiParticles.length > 0) return;
+
+            for (let i = 0; i < 250; i++) {
+                confettiParticles.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * -confettiCanvas.height,
+                    size: Math.random() * 12 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 5 - 2.5
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiParticles.forEach(p => {
+                p.y += p.speed;
+                p.x += Math.sin(p.y / 20) * 2;
+                p.rotation += p.rotationSpeed;
+                
+                confettiCtx.save();
+                confettiCtx.translate(p.x + p.size/2, p.y + p.size/2);
+                confettiCtx.rotate(p.rotation * Math.PI / 180);
+                confettiCtx.fillStyle = p.color;
+                confettiCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                confettiCtx.restore();
+                
+                if(p.y > confettiCanvas.height + 20) {
+                    p.y = -20;
+                    p.x = Math.random() * confettiCanvas.width;
+                }
+            });
+            requestAnimationFrame(animateConfetti);
+        }
+    
+        // --- Fade In Music ---
+        function fadeInMusic(audio) {
+            audio.volume = 0;
+            audio.play().catch(e => console.log("Autoplay prevented:", e));
+            let vol = 0;
+            const fade = setInterval(() => {
+                vol += 0.05;
+                if (vol >= 0.7) {
+                    audio.volume = 0.7;
+                    clearInterval(fade);
+                } else {
+                    audio.volume = vol;
+                }
+            }, 200);
+        }
+
+        // --- Pesan Rahasia ---
+        function showSecretMessage() {
+            if (isSecretMessageShown) return;
+            isSecretMessageShown = true;
+            
+            const secretMessages = [
+                "Kamu tau nggak sih kalau kamu itu... *eh nggak jadi* 😏",
+                "Rahasia: Aku sengaja bikin ini biar kamu senyum-senyum dikit",
+                "Klik lagi deh, siapa tau ada hadiahnya~",
+                "Fakta: Kamu 73% lebih manis dari coklat 🍫",
+                "Awas jangan keseringan klik, aku dah gapunya kalimat lagi "
+            ];
+            
+            const randomMessage = secretMessages[Math.floor(Math.random() * secretMessages.length)];
+            alert(randomMessage);
+            
+            setTimeout(() => {
+                isSecretMessageShown = false;
+            }, 10000);
+        }
+
+        // --- Responsive Design ---
+        window.addEventListener('resize', function() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        });
+
+        // --- Handle Enter Key ---
+        document.getElementById('name-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateName();
+            }
+            
+            this.style.boxShadow = '0 0 0 3px rgba(255, 107, 107, 0.3)';
+            setTimeout(() => {
+                this.style.boxShadow = 'none';
+            }, 300);
+        });
+</script>
+</body>
+</html>
